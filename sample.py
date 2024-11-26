@@ -3,6 +3,8 @@ import random
 
 import pandas as pd
 from fastapi import FastAPI
+from dataclasses import dataclass
+from fastapi.responses import JSONResponse
 
 
 def save_data_into_employee_file(f,i):
@@ -30,16 +32,32 @@ def getRandomDepartment():
     depts = get_department_ids()
     return {"dept_id": int(random.choice(depts))}
 
+# class Employee:
+#     def __init__(self, emp_id,name,department_id):
+#         self.name=name
+#         self.emp_id=emp_id
+#         self.dept_id=department_id
+
+@dataclass
 class Employee:
-    def __init__(self, emp_id,name,department_id):
-        self.name=name
-        self.emp_id=emp_id
-        self.dept_id=department_id
+    name: str
+    emp_id: int 
+    department_id: int
+    
+    def validate(self):
+        # if not self.name.isalnum():
+        #     raise ValueError("Name must not contains special symbols")
+        return self.name.isalnum()
         
-@app.post('/employee/')
+            
+        
+        
+@app.post('/employee/', status_code=201)
 def save_data(data: Employee):
-    import pdb;pdb.set_trace()
-    add_data_to_employee_file(data)
+    if not data.validate():
+        error = {"message": "Name must not contain special characters"}
+        return JSONResponse(status_code=400, content=error)
+    add_data_to_employee_file(data.__dict__)
     return {'data': data}
 
 # @app.post('/employee/{employee_id}')
