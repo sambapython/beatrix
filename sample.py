@@ -38,11 +38,15 @@ def getRandomDepartment():
 #         self.emp_id=emp_id
 #         self.dept_id=department_id
 
-@dataclass
-class Employee:
-    name: str
-    emp_id: int 
-    department_id: int
+# @dataclass
+# class Employee:
+#     name: str
+#     emp_id: int 
+#     department_id: int
+
+
+    
+    
     
     def validate(self):
         # if not self.name.isalnum():
