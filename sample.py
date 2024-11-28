@@ -5,7 +5,48 @@ import pandas as pd
 from fastapi import FastAPI
 from dataclasses import dataclass
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field, field_validator, model_validator
 
+app = FastAPI()
+
+class Employee(BaseModel):
+    id: int 
+    department: str = Field(pattern="[a-zA-z]+")
+    name: str = Field(pattern='[a-zA-Z_0-9]+')
+    salary: int = Field(gt=100000, le=10000000)
+    
+    @field_validator('salary')
+    def validate_salary(cls, value):
+        print("SALARY VALIDATION CALLED")
+        if value > 7000000:
+            raise ValueError("value must less than 7000000")
+        return value
+    
+    # @field_validator("department")
+    # def validate_department(cls, value):
+    #     return value.upper()
+    
+    
+        
+    @model_validator(mode='after')
+    def validate(self):
+        print("MODEL VALIDATION CALLEDDDDDDDDDDDDDDDDDDDDDD")
+        if 'admin' in self.department:
+            if self.salary > 1000000:
+                raise ValueError("salary must be less than 1000000")
+        self.department = self.department.upper()
+        return self
+            
+                
+        
+          
+@app.post('/employee/', status_code=201)
+def save_data(data:Employee):
+    # if not data.validate():
+    #     error = {"message": "Name must not contain special characters"}
+    #     return JSONResponse(status_code=400, content=error)
+    # add_data_to_employee_file(data.__dict__)
+    return {'data': data}
 
 def save_data_into_employee_file(f,i):
     print(threading.active_count())
@@ -21,7 +62,7 @@ def add_data_to_employee_file(data):
         f.write(row)
         f.write("\n")
 
-app = FastAPI()
+
 
 def get_department_ids():
     df = pd.read_csv('departments.csv')
@@ -43,26 +84,21 @@ def getRandomDepartment():
 #     name: str
 #     emp_id: int 
 #     department_id: int
+    
+#     def __init__(self, name: str, emp_id:int,  department_id: int):
+#         print("INIT INVOKEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+#         if not self.name.isalnum():
+#             raise ValueError("Invalid name")
+#         self.name = name
+#         self.emp_id = emp_id
+#         self.department_id = department_id
+    
+#     def validate(self):
+#         # if not self.name.isalnum():
+#         #     raise ValueError("Name must not contains special symbols")
+#         return self.name.isalnum()
 
 
-    
-    
-    
-    def validate(self):
-        # if not self.name.isalnum():
-        #     raise ValueError("Name must not contains special symbols")
-        return self.name.isalnum()
-        
-            
-        
-        
-@app.post('/employee/', status_code=201)
-def save_data(data: Employee):
-    if not data.validate():
-        error = {"message": "Name must not contain special characters"}
-        return JSONResponse(status_code=400, content=error)
-    add_data_to_employee_file(data.__dict__)
-    return {'data': data}
 
 # @app.post('/employee/{employee_id}')
 # def save_data(employee_id: int):
