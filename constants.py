@@ -27,4 +27,4 @@ departments = {"1":'Human Resources (HR)',
 "5":'Project Management',
 "5":'Client Relations',
 "5":'Event Planning',
-"5":'Data Analytics')
+"5":'Data Analytics'}

@@ -1,13 +1,21 @@
 import os
 import random 
+from time import sleep
 
 import pandas as pd
 from fastapi import FastAPI
 from dataclasses import dataclass
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator, model_validator
+import exception_handlers
+
 
 app = FastAPI()
+
+@app.exception_handler(Exception)
+async def exceptions_handler(request, exception):
+    return exception_handlers.python_exception_handler(exception)
+    
 
 class Employee(BaseModel):
     id: int 
@@ -68,10 +76,22 @@ def get_department_ids():
     df = pd.read_csv('departments.csv')
     return df.id.values
 
+
+
 @app.get("/randomDepartment")
 def getRandomDepartment():
+    # try:
     depts = get_department_ids()
+    print("processing")
+    raise Exception("EXFEPTION")
+    # except Exception as err:
+    #     print("*"*100)
+    #     print(err)
+    #     return {"Error": str(err)}
+    # except:
+    #     return {"Error:EXCEPT": str(err)}
     return {"dept_id": int(random.choice(depts))}
+        
 
 # class Employee:
 #     def __init__(self, emp_id,name,department_id):
