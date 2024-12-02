@@ -3,14 +3,63 @@ import random
 from time import sleep
 
 import pandas as pd
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from dataclasses import dataclass
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator, model_validator
 import exception_handlers
+from typing import Annotated
 
 
 app = FastAPI()
+class Expense(BaseModel):
+    description: str 
+    amount: float
+    category: str
+    
+# def authenticate():
+#     return False
+def authenticate():
+    print("vallidating authentication")
+    yield True 
+    print("closing the resources used to authenticate")
+    
+def get_session():
+    print("gettding the db session")
+    yield "SESSION"
+    print("closing the session")
+
+# class UserAuthentication:
+#     # def __init__(self, name):
+#     #     self.name=name
+#     def __call__(self):
+#         return True   
+#     @classmethod
+#     def get_seesion(cls, name):
+#         return name
+
+class UserAuthenitcate:
+    def __init__(self, name):
+        self.name = name
+        
+    def __call__(self):
+        return self.name
+
+u1=UserAuthenitcate("HELLO")
+@app.post("/expenses", )
+def expenses(data: Expense, is_authenticate: Annotated[bool, Depends(u1)],
+             session: Annotated[str, Depends(get_session)]):
+    print("PROCCESING EXPENSES")
+    if is_authenticate:
+        print("Authentication failed")
+        return {"msg": "success"}
+    else:
+        print("Authentication SUCCESSFUL")
+        return {"msg": "FAILED"}
+    
+print("PROCCESING EXP")
+    
+    
 
 @app.exception_handler(Exception)
 async def exceptions_handler(request, exception):
