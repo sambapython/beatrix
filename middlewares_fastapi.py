@@ -24,22 +24,37 @@ class Employee:
     
     
 @app.middleware("http")
-async def IPcheck(request, call_next):
-    resp = get_county('123.45.6.78')
+def IPcheck(request, call_next):
+    resp = get_county('152.59.199.179')
     country = resp.text.strip()
     print("*"*50)
     print(country)
     if country=="IN":
-        resp = await call_next(request)
+        resp = call_next(request)
     else:
         resp = JSONResponse(status_code=400, content={"error": "OUT OF THE COUNTRY REQUEST"})
     return resp
     
     
 @app.post("/expenses", )
-def expenses(data: Expense):
+async def expenses(data: Expense):
     emp = Employee(name="name1", cat_name="cat1")
-    return {"data": emp}
+    #return {"data": emp}
+    return {"data": "expenses"}
+
+@app.post("/expenses1", )
+async def expenses12(data: Expense):
+    emp = Employee(name="name1", cat_name="cat1")
+    # return {"data": emp}
+    return {"data": "expenses1"}
+
+@app.post("/expenses2", )
+async def expenses(data: Expense):
+    emp = Employee(name="name1", cat_name="cat1")
+    # return {"data": emp}
+    return {"data": "expenses2"}
+
+
     # emp = Employee(name="name1", cat_name="cat1")
     # #{"data": emp, "ar1": "ar1"}
     # #return {"data": emp}
